@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Управление персоналом{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h4><i class="fas fa-users me-2"></i>Управление персоналом</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-user-plus me-2"></i>Регистрация сотрудника</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('admin_register') }}" method="GET">
+                    <p>Зарегистрируйте нового сотрудника или тимлида</p>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="fas fa-plus me-2"></i>Новый пользователь
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-chart-bar me-2"></i>Статистика</h5>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-md-4">
+                        <div class="border rounded p-3">
+                            <h3>{{ users|length }}</h3>
+                            <small>Всего сотрудников</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-3">
+                            <h3>{{ employees|length }}</h3>
+                            <small>Активных сотрудников</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="border rounded p-3">
+                            <h3>{{ teamleads|length }}</h3>
+                            <small>Активных тимлидов</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <h5><i class="fas fa-list me-2"></i>Список сотрудников</h5>
+            </div>
+            <div class="card-body">
+                <!-- Фильтры -->
+                <div class="row mb-3">
+                    <div class="col-md-4 mb-2">
+                        <input type="text" id="searchEmail" class="form-control" placeholder="🔍 Поиск по email...">
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <select id="roleFilter" class="form-select">
+                            <option value="">Все роли</option>
+                            <option value="Admin">Администратор</option>
+                            <option value="TeamLead">Тимлид</option>
+                            <option value="Employee">Сотрудник</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <select id="statusFilter" class="form-select">
+                            <option value="">Все статусы</option>
+                            <option value="active">Активен</option>
+                            <option value="fired">Уволен</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover" id="usersTable">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>ФИО</th>
+                                <th>Email</th>
+                                <th>Роль</th>
+                                <th>Статус</th>
+                                <th>Активных задач</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr class="user-row" data-email="{{ user.email }}" data-role="{{ user.role }}" data-status="{{ user.status }}">
+                                <td>{{ user.user_id }}</td>
+                                <td>{{ user.full_name }}</td>
+                                <td class="user-email">{{ user.email }}</td>
+                                <td>
+                                    {% if user.role == 'Admin' %}
+                                    <span class="badge bg-danger">Администратор</span>
+                                    {% elif user.role == 'TeamLead' %}
+                                    <span class="badge bg-primary">Тимлид</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Сотрудник</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.status == 'active' %}
+                                    <span class="badge bg-success">Активен</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Уволен</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.active_tasks_count or 0 }}</td>
+                                <td>
+                                    {% if user.role != 'Admin' %}
+                                        {% if user.status == 'active' %}
+                                        <form method="POST" action="{{ url_for('admin_fire_user', user_id=user.user_id) }}"
+                                              onsubmit="return confirm('Вы уверены, что хотите уволить {{ user.full_name }}?')">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-user-slash me-1"></i>Уволить
+                                            </button>
+                                        </form>
+                                        {% else %}
+                                        <form method="POST" action="{{ url_for('admin_restore_user', user_id=user.user_id) }}"
+                                              onsubmit="return confirm('Вы уверены, что хотите восстановить {{ user.full_name }}?')">
+                                            <button type="submit" class="btn btn-sm btn-success">
+                                                <i class="fas fa-user-plus me-1"></i>Восстановить
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    {% else %}
+                                    <span class="text-muted">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const searchEmail = document.getElementById('searchEmail');
+    const roleFilter = document.getElementById('roleFilter');
+    const statusFilter = document.getElementById('statusFilter');
+    const rows = document.querySelectorAll('.user-row');
+
+    function filterTable() {
+        const searchTerm = searchEmail.value.toLowerCase();
+        const roleValue = roleFilter.value;
+        const statusValue = statusFilter.value;
+
+        rows.forEach(row => {
+            const email = row.querySelector('.user-email').textContent.toLowerCase();
+            const role = row.getAttribute('data-role');
+            const status = row.getAttribute('data-status');
+
+            const matchesSearch = email.includes(searchTerm);
+            const matchesRole = !roleValue || role === roleValue;
+            const matchesStatus = !statusValue || status === statusValue;
+
+            row.style.display = (matchesSearch && matchesRole && matchesStatus) ? '' : 'none';
+        });
+    }
+
+    searchEmail.addEventListener('input', filterTable);
+    roleFilter.addEventListener('change', filterTable);
+    statusFilter.addEventListener('change', filterTable);
+</script>
+{% endblock %}

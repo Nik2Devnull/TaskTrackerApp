@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Комментарии к задаче #{{ task.task_id }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4><i class="fas fa-tasks me-2"></i>Задача #{{ task.task_id }}: {{ task.title }}</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-folder me-2"></i>Проект:</strong> {{ task.project_name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-user me-2"></i>Исполнитель:</strong> {{ task.assignee_name or 'Не назначен' }}</p>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong><i class="fas fa-user-pen me-2"></i>Автор:</strong> {{ task.author_name }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5><i class="fas fa-history me-2"></i>История комментариев</h5>
+            </div>
+            <div class="card-body">
+                {% if comments %}
+                    {% for comment in comments %}
+                    <div class="border rounded p-3 mb-3 {% if comment.author_id == user_id %}bg-light{% endif %}">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <strong>
+                                    <i class="fas fa-user-circle me-1"></i>
+                                    {{ comment.author_name }}
+                                </strong>
+                                {% if comment.author_role == 'TeamLead' %}
+                                <span class="badge bg-danger ms-2">Тимлид</span>
+                                {% else %}
+                                <span class="badge bg-secondary ms-2">Сотрудник</span>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">
+                                <i class="fas fa-calendar-alt me-1"></i>
+                                {{ comment.created_at.strftime('%d.%m.%Y %H:%M') if comment.created_at else comment.created_at }}
+                            </small>
+                        </div>
+                        <div class="mt-2">
+                            {{ comment.comment_text | safe }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-comment-slash me-2"></i>Пока нет комментариев к этой задаче
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-plus-circle me-2"></i>Добавить комментарий</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('comments_add', task_id=task.task_id) }}">
+                    <div class="mb-3">
+                        <label for="comment_text" class="form-label">Ваш комментарий</label>
+                        <textarea class="form-control" id="comment_text" name="comment_text" rows="4"
+                                  placeholder="Напишите ваш комментарий здесь..."></textarea>
+                        <div class="form-text text-muted mt-2">
+                            <i class="fas fa-info-circle me-1"></i>
+                            {% if user_role == 'TeamLead' %}
+                            Рекомендуется начинать комментарий с ">>" (например: &gt;&gt; Задача выполнена отлично!)
+                            {% else %}
+                            Рекомендуется начинать комментарий с ">>" (например: &gt;&gt; Приступил к выполнению)
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('comments_list') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Назад к списку
+                        </a>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-paper-plane me-2"></i>Отправить комментарий
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

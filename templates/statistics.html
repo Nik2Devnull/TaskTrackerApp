@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Статистика{% endblock %}
+
+{% block content %}
+<h2 class="mb-4"><i class="fas fa-chart-line me-2"></i>Статистика по проектам</h2>
+
+<div class="row">
+    {% for project_name, stats in stats_data.items() %}
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-dark text-white">
+                <h5><i class="fas fa-folder me-2"></i>{{ project_name }}</h5>
+            </div>
+            <div class="card-body">
+                {% set total_tasks = stats.get('Всего задач', '0') %}
+                {% set completed_tasks = stats.get('Выполнено', '0') %}
+                {% set percent = stats.get('Процент выполнения', '0') %}
+                {% set percent_value = percent|replace('%', '')|float if percent else 0 %}
+
+                <div class="row text-center mb-3">
+                    <div class="col-6">
+                        <div class="border rounded p-3 bg-light">
+                            <h3>{{ total_tasks }}</h3>
+                            <small class="text-muted">Всего задач</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="border rounded p-3 bg-light">
+                            <h3 class="text-success">{{ completed_tasks }}</h3>
+                            <small class="text-muted">Выполнено</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="progress mb-3" style="height: 30px;">
+                    <div class="progress-bar bg-success"
+                         role="progressbar"
+                         style="width: {{ percent_value }}%;"
+                         aria-valuenow="{{ percent_value }}"
+                         aria-valuemin="0"
+                         aria-valuemax="100">
+                        {{ percent if percent else '0%' }}
+                    </div>
+                </div>
+
+                <table class="table table-sm">
+                    <tbody>
+                        <tr>
+                            <td><i class="fas fa-spinner text-warning me-2"></i>В работе</td>
+                            <td class="text-end"><strong>{{ stats.get('В работе', '0') }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-ban text-danger me-2"></i>Отменено</td>
+                            <td class="text-end"><strong>{{ stats.get('Отменено', '0') }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-clock text-danger me-2"></i>Просрочено</td>
+                            <td class="text-end"><strong>{{ stats.get('Просрочено', '0') }}</strong></td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-calendar me-2"></i>Среднее время выполнения</td>
+                            <td class="text-end"><strong>{{ stats.get('Среднее время выполнения (дней)', '0') }} дн.</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if stats_data|length == 0 %}
+<div class="alert alert-info text-center">
+    <i class="fas fa-info-circle me-2"></i>Нет данных по проектам
+</div>
+{% endif %}
+{% endblock %}

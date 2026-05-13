@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Дашборд{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <h1 class="card-title">
+                    <i class="fas fa-chalkboard-user me-2"></i>Добро пожаловать, {{ user_name }}!
+                </h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-chart-simple me-2"></i>Быстрый старт</h5>
+            </div>
+            <div class="card-body">
+                {% if user_role == 'Admin' %}
+                <p><i class="fas fa-users text-primary me-2"></i> Управляйте сотрудниками компании</p>
+                <p><i class="fas fa-building text-success me-2"></i> Создавайте новые проекты</p>
+                {% elif user_role == 'TeamLead' %}
+                <p><i class="fas fa-check-circle text-success me-2"></i> Управляйте задачами команды</p>
+                <p><i class="fas fa-plus-circle text-primary me-2"></i> Создавайте новые задачи</p>
+                <p><i class="fas fa-users text-info me-2"></i> Назначайте исполнителей</p>
+                <p><i class="fas fa-chart-line text-warning me-2"></i> Смотрите статистику</p>
+                {% else %}
+                <p><i class="fas fa-tasks text-primary me-2"></i> Просматривайте свои задачи</p>
+                <p><i class="fas fa-edit text-warning me-2"></i> Обновляйте статус</p>
+                <p><i class="fas fa-comment text-info me-2"></i> Добавляйте комментарии</p>
+                <p><i class="fas fa-calendar text-danger me-2"></i> Следите за сроками</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-info-circle me-2"></i>О системе</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Task Tracker</strong> — система управления задачами</p>
+                <p>База данных PostgreSQL</p>
+                <p>Всего проектов: {{ projects|length }}</p>
+                <p><i class="fas fa-database me-2"></i>Данные загружены и готовы к работе</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h5><i class="fas fa-rocket me-2"></i>Текущие проекты</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% for project in projects %}
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('view_project', project_id=project.project_id) }}" class="text-decoration-none">
+                            <div class="card bg-light h-100 project-card">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-folder-open fa-2x text-primary mb-2"></i>
+                                    <h6>{{ project.name }}</h6>
+                                    <small class="text-muted">ID: {{ project.project_id }}</small>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .project-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+    }
+    .project-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    a.text-decoration-none:hover .project-card {
+        background-color: #e9ecef !important;
+    }
+</style>
+{% endblock %}
