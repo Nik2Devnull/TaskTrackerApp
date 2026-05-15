@@ -31,38 +31,6 @@
 
 ---
 
-### Структура проекта
-
-
-app.py # Главное Flask-приложение
-db.py # Слой доступа к БД (вызов процедур)
-
-templates/ # HTML-шаблоны + Bootstrap 5
-- base.html # Базовый шаблон
-- login.html # Страница авторизации
-- dashboard.html # Дашборд
-- my_tasks.html # Мои задачи (сотрудник)
-- tasks.html # Все задачи (тимлид)
-- create_task.html # Создание задачи
-- assign_task.html # Назначение исполнителя
-- statistics.html # Статистика по проектам
-- comments_list.html # Выбор задачи для комментариев
-- comments_view.html # Просмотр комментариев
-- view_task.html # Детальный просмотр задачи
-- view_project.html # Детальный просмотр проекта
-- admin_users.html # Управление персоналом
-- admin_register.html# Регистрация пользователя
-- admin_projects.html# Управление проектами
-
-documents/ # Документация к проекту
-- Задание по БД - 6 семестр.doc
-- Task Tracker.docx # Описание проекта, результат выполненной работы, скрины программы
-- Task_tracker.drawio # ER-диаграммы и реляционные модели
-
-README.md # Описание проекта
-
----
-
 ## База данных
 
 ER-диаграмма и реляционные модели храняться в Task_tracker.drawio
